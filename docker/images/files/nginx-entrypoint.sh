@@ -148,6 +148,45 @@ else
     PENPOT_CSP_SCRIPT_HASHES=""
 fi
 
+# EGEN: opt-in embedding of Penpot in an iframe (PENPOT_FRAME_ANCESTORS).
+#
+# Upstream forbids any framing except by the same origin: it sends
+# `X-Frame-Options: SAMEORIGIN` unconditionally and `frame-ancestors 'self'`
+# inside a CSP that ships in report-only mode, where frame-ancestors is NOT
+# enforced. Embedding Penpot in a host application therefore fails with
+# the browser refusing the frame, and extending only the CSP would not help.
+#
+# PENPOT_FRAME_ANCESTORS is a space-separated list of origins allowed to
+# embed Penpot (e.g. "https://core.example.org https://*.example.org").
+# When it is set:
+#   - X-Frame-Options is dropped (it cannot express a list of origins);
+#   - an ENFORCED `Content-Security-Policy: frame-ancestors 'self' <origins>`
+#     header is sent whatever PENPOT_CSP_MODE says, so framing stays
+#     restricted to the listed origins instead of becoming unrestricted;
+#   - the default policy uses the same list, so enforce mode does not
+#     intersect it down to 'self'.
+# When it is unset, the behaviour is exactly the upstream one.
+# Only scheme://host[:port] origins are accepted (optionally "*." host
+# prefix): no bare "*", no quotes, no semicolon, so a typo cannot silently
+# open the frame to everybody or inject another CSP directive.
+if [ -n "${PENPOT_FRAME_ANCESTORS:-}" ]; then
+    read -ra _fa_origins <<< "${PENPOT_FRAME_ANCESTORS}"
+    _fa_list=""
+    for _fa_origin in "${_fa_origins[@]}"; do
+        if [[ ! "${_fa_origin}" =~ ^https?://(\*\.)?([A-Za-z0-9-]+\.)*[A-Za-z0-9-]+(:[0-9]{1,5})?$ ]]; then
+            echo "penpot: invalid PENPOT_FRAME_ANCESTORS entry '${_fa_origin}'; expected scheme://host[:port] origins separated by spaces" >&2
+            exit 1
+        fi
+        _fa_list="${_fa_list} ${_fa_origin}"
+    done
+    export PENPOT_CSP_FRAME_ANCESTORS="'self'${_fa_list}"
+    export PENPOT_FRAME_DIRECTIVE="add_header Content-Security-Policy \"frame-ancestors ${PENPOT_CSP_FRAME_ANCESTORS}\" always;"
+    unset _fa_origins _fa_list _fa_origin
+else
+    export PENPOT_CSP_FRAME_ANCESTORS="'self'"
+    export PENPOT_FRAME_DIRECTIVE="add_header X-Frame-Options SAMEORIGIN always;"
+fi
+
 # Remember whether the policy comes from the deployment before the default
 # is applied, so the warning below only fires for the default one.
 if [ -n "${PENPOT_CSP_POLICY:-}" ]; then
@@ -161,15 +200,16 @@ fi
 # hardcode the whole policy without recomputing them at each release. These
 # variables let it declare only what it adds.
 #
-# base-uri, form-action, object-src and frame-ancestors are deliberately not
-# extensible: there is no legitimate reason to relax them, and doing so
-# silently removes the protection they provide. A deployment that really
+# base-uri, form-action and object-src are deliberately not extensible:
+# there is no legitimate reason to relax them, and doing so silently removes
+# the protection they provide. frame-ancestors is only extended through
+# PENPOT_FRAME_ANCESTORS (see above), which validates every origin. A deployment that really
 # needs it can still set PENPOT_CSP_POLICY and own the whole policy.
 if [ "${PENPOT_CSP_POLICY_IS_CUSTOM}" = "false" ]; then
     export PENPOT_CSP_POLICY="default-src 'self'\
 ; base-uri 'self'\
 ; object-src 'none'\
-; frame-ancestors 'self'\
+; frame-ancestors ${PENPOT_CSP_FRAME_ANCESTORS}\
 ; form-action 'self'\
 ; manifest-src 'self'\
 ; script-src 'self' 'wasm-unsafe-eval'${PENPOT_CSP_SCRIPT_HASHES}${PENPOT_CSP_SCRIPT_SRC_EXTRA:+ ${PENPOT_CSP_SCRIPT_SRC_EXTRA}}\
@@ -238,7 +278,7 @@ else
     export PENPOT_HSTS_DIRECTIVE=""
 fi
 
-envsubst "\$PENPOT_CSP_DIRECTIVE,\$PENPOT_HSTS_DIRECTIVE" \
+envsubst "\$PENPOT_CSP_DIRECTIVE,\$PENPOT_HSTS_DIRECTIVE,\$PENPOT_FRAME_DIRECTIVE" \
          < /tmp/nginx-security-headers.conf.template > /etc/nginx/nginx-security-headers.conf
 
 exec "$@";

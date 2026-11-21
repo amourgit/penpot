@@ -599,6 +599,46 @@ Remember to repeat that step on every upgrade, since the hashes will have change
   suits deployments that do not use plugins. Anywhere else it needs a policy of your own.
 </p>
 
+### Embedding Penpot in another application
+
+> This option is specific to the EGEN fork of Penpot.
+
+By default Penpot refuses to be displayed in a frame by any other origin: it sends
+`X-Frame-Options: SAMEORIGIN`, and `frame-ancestors 'self'` in the Content Security Policy.
+Note that in the default `report-only` mode the CSP is not enforced, so it is
+`X-Frame-Options` that blocks the frame.
+
+To embed Penpot in a host application (an intranet, a portal, a micro-frontend shell), list
+the origins that may do so:
+
+```bash
+PENPOT_FRAME_ANCESTORS: "https://portal.example.org https://*.example.org"
+```
+
+When the variable is set:
+
+- `X-Frame-Options` is no longer sent;
+- an **enforced** `Content-Security-Policy: frame-ancestors 'self' <origins>` header is sent,
+  whatever the value of `PENPOT_CSP_MODE`, so framing stays restricted to those origins;
+- the default policy uses the same list, so `PENPOT_CSP_MODE: enforce` behaves consistently.
+
+Each entry must be a `scheme://host[:port]` origin, optionally with a `*.` host prefix. A bare
+`*`, quotes, semicolons or paths are rejected and the container refuses to start, so a typo
+cannot silently open the frame to everybody. When the variable is unset, the behaviour is
+exactly the upstream one.
+
+If you set `PENPOT_CSP_POLICY` yourself and run `PENPOT_CSP_MODE: enforce`, your own
+`frame-ancestors` directive is intersected with the one above: keep both consistent.
+
+Two further points matter for a working embedded session:
+
+- Serve Penpot from a **subdomain of the same site** as the host application
+  (`design.example.org` next to `portal.example.org`). The session cookie is `SameSite=Lax`
+  by default and is then sent normally inside the frame.
+- For a **different site**, enable the `cors` flag (the cookie becomes `SameSite=None`) and
+  `secure-session-cookies` (HTTPS only). Browsers that block third-party cookies can still
+  prevent the login from working inside the frame.
+
 ### HTTP Strict Transport Security
 
 HSTS is enabled automatically when `PENPOT_PUBLIC_URI` uses the `https` scheme, and

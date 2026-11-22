@@ -27,6 +27,14 @@ if [[ ! "$CORE_ORIGIN" =~ ^https?://[A-Za-z0-9.-]+(:[0-9]{1,5})?$ ]]; then
     exit 2
 fi
 
+case "$CORE_ORIGIN" in
+    *://0.0.0.0|*://0.0.0.0:*)
+        echo "  ⚠ 0.0.0.0 n'est pas une adresse de navigation : le serveur écoute sur toutes les interfaces, mais il faut ouvrir"
+        echo "    le Core sur http://localhost:<port>. Sous 0.0.0.0 le navigateur est sur un AUTRE site que Penpot (localhost) :"
+        echo "    la session Penpot ne passe pas dans l'iframe, et l'origine « 0.0.0.0 » doit être autorisée à part."
+        echo ;;
+esac
+
 echo "Penpot : $PENPOT_URL"
 echo "Core   : $CORE_ORIGIN"
 echo
@@ -121,7 +129,23 @@ elif [ -z "$XFO" ]; then
     note "aucune restriction d'embarquement n'est annoncée : l'iframe s'affichera, mais n'importe quel site pourra aussi embarquer Penpot. Définir PENPOT_FRAME_ANCESTORS."
 fi
 
+# --- Backend de Penpot : le frontend (nginx) répond même quand le backend est arrêté ----------------
+BACKEND_FAIL=0
+API_CODE="$(curl -s -m 10 -o /dev/null -w '%{http_code}' "$FINAL_ORIGIN/api/rpc/command/get-profile" 2>/dev/null || true)"
+case "$API_CODE" in
+    502|503|504)
+        ko "le BACKEND de Penpot ne répond pas (HTTP $API_CODE sur /api) : le frontend est là, mais l'interface ne se chargera pas."
+        note "docker compose ps   et   docker compose logs --tail 40 penpot-backend"
+        note "« password authentication failed for user \"penpot\" » : le mot de passe de .env n'est plus celui de la base (voir le README, « Dépannage »)."
+        BACKEND_FAIL=1 ;;
+    2??|3??|401|403) ok "le backend de Penpot répond (HTTP $API_CODE)" ;;
+esac
+
 echo
+if [ $FAIL -eq 0 ] && [ $BACKEND_FAIL -eq 1 ]; then
+    echo "Résultat : l'embarquement est autorisé, MAIS le backend de Penpot est en panne : corriger le ✗ ci-dessus."
+    exit 1
+fi
 if [ $FAIL -eq 0 ]; then
     echo "Résultat : Penpot PEUT être affiché dans l'iframe du Core ($CORE_ORIGIN)."
     echo "Si l'iframe reste vide malgré tout : ouvrir la console du navigateur (F12) et chercher « Refused to frame » ou « Mixed Content »."

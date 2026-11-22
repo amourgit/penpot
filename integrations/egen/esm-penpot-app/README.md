@@ -50,7 +50,7 @@ npm run pack:tarball   # civitas-esm-penpot-app-<version>.tgz
    ```json
    { "apps": { "@civitas/esm-penpot-app": "https://github.com/amourgit/penpot/releases/download/egen-app-v1.0.0/civitas-esm-penpot-app-1.0.0.tgz" } }
    ```
-4. **À froid** : sur la machine ou dans l'étape de build du Core, `yarn external:sync --strict` (télécharge, valide,
-   écrit le verrou), puis `node tools/precompress.mjs`, puis **redémarrer** le Core (`yarn start:prod`) ou le redéployer.
+4. **À froid** : dans le Core, **`yarn prepare:prod`** (une commande : contrôles, `external:sync --strict`,
+   vérification du verrou, précompression), puis **redémarrer** le Core (`yarn start:prod`) ou le redéployer.
    Le Core lit le verrou au démarrage et revérifie l'empreinte SHA-256 du bundle.
 5. Renseigner `penpotUrl` dans la configuration du Core.

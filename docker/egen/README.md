@@ -70,6 +70,30 @@ fichiers de ce fork, ou `PENPOT_FRAME_ANCESTORS` absent), une origine du Core no
 `http` ≠ `https`, port), une redirection vers une autre adresse. Il se teste lui-même :
 `bash docker/egen/tests/test-check-embedding.sh`.
 
+## Dépannage
+
+**Ouvrir le Core sur `http://localhost:8080`, pas sur `http://0.0.0.0:8080`.** `yarn start:prod` affiche
+`http://0.0.0.0:8080` : c'est l'adresse d'écoute (toutes les interfaces), pas une adresse de navigation. Sous `0.0.0.0` le
+navigateur est sur un autre *site* que `localhost:9001` (la session Penpot ne passe pas dans l'iframe) et c'est une origine
+distincte à autoriser dans `PENPOT_FRAME_ANCESTORS`. Le journal du frontend Penpot montre l'origine réelle : le
+`Referer` des requêtes (`docker compose logs penpot-frontend`).
+
+**Le backend redémarre en boucle : `password authentication failed for user "penpot"`.** Postgres n'applique
+`POSTGRES_PASSWORD` qu'à la **création** du volume : si `.env` a changé depuis le premier démarrage, la base garde l'ancien
+mot de passe. Les symptômes : `docker compose ps` montre `penpot-backend` / `penpot-admin-console` en redémarrage, et le
+frontend journalise des `502` sur `/ws/notifications` (l'interface ne se charge pas). Deux remèdes :
+
+```bash
+# Sans perdre de données : aligner la base sur le mot de passe de .env (remplacer essai-local par POSTGRES_PASSWORD)
+docker compose exec penpot-postgres psql -U penpot -d penpot -c "ALTER USER penpot WITH PASSWORD 'essai-local';"
+docker compose restart penpot-backend penpot-admin-console
+
+# Essai jetable (EFFACE la base et les fichiers) : repartir de zéro
+docker compose down -v && docker compose up -d
+```
+
+`check-embedding.sh` détecte ce cas (« le BACKEND de Penpot ne répond pas ») en plus des refus d'embarquement.
+
 ## Cas d'un autre site que le Core
 
 Ajouter `enable-cors` à `PENPOT_FLAGS` (cookie `SameSite=None`) et garder `secure-session-cookies` (HTTPS obligatoire).

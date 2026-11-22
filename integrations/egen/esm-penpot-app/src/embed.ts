@@ -136,17 +136,29 @@ export function createPenpotLifecycle(options: PenpotLifecycleOptions): LifeCycl
       let teardown: () => void = () => undefined;
       if (iframe) {
         iframe.setAttribute('allow', IFRAME_ALLOW);
+        // Hauteur = espace visible DANS la zone de scroll du shell (#egen-scroll-region),
+        // pas le viewport : le footer, la zone basse et les marges de la carte ne
+        // doivent pas être couverts (sinon la zone parente scrolle).
+        const region = iframe.closest('#egen-scroll-region');
         const fit = () => {
-          const top = Math.min(Math.max(iframe.getBoundingClientRect().top, 0), window.innerHeight);
-          const height = Math.floor(window.innerHeight - top - cfg.heightOffset);
+          const iframeRect = iframe.getBoundingClientRect();
+          const regionRect = region?.getBoundingClientRect();
+          const bottom = regionRect ? regionRect.bottom : window.innerHeight;
+          const top = regionRect ? Math.max(iframeRect.top, regionRect.top) : Math.max(iframeRect.top, 0);
+          const height = Math.floor(bottom - top - cfg.heightOffset);
           iframe.style.height = `${Math.max(MIN_HEIGHT, height)}px`;
         };
         fit();
         const frame = window.requestAnimationFrame(fit);
         window.addEventListener('resize', fit);
+        // La hauteur de la zone change aussi sans resize fenêtre (topbar, footer,
+        // workbench) : on observe la zone elle-même.
+        const observer = region && typeof ResizeObserver !== 'undefined' ? new ResizeObserver(fit) : null;
+        observer?.observe(region as Element);
         teardown = () => {
           window.cancelAnimationFrame(frame);
           window.removeEventListener('resize', fit);
+          observer?.disconnect();
         };
       }
 

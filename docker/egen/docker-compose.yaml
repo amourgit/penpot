@@ -1,8 +1,9 @@
 # SPDX-License-Identifier: MPL-2.0
 #
 # Penpot pour EGEN — déploiement basé sur les images OFFICIELLES penpotapp/*
-# à la version épinglée, avec deux fichiers nginx de ce fork montés en lecture
-# seule (PENPOT_FRAME_ANCESTORS : embarquement en iframe dans le Core).
+# à la version épinglée. Le frontend utilise une image dérivée locale
+# (egen-penpot-frontend, voir Dockerfile.frontend) qui cuit les deux fichiers
+# nginx du fork : PENPOT_FRAME_ANCESTORS (embarquement en iframe).
 #
 # Écarts volontaires par rapport à docker/images/docker-compose.yaml (upstream) :
 #   - version épinglée (PENPOT_VERSION) au lieu du défaut périmé 2.18 ;
@@ -11,8 +12,8 @@
 #   - mots de passe et drapeaux pilotés par l'environnement (.env) ;
 #   - télémétrie désactivée par défaut ;
 #   - ports publiés sur 127.0.0.1 uniquement (derrière un reverse proxy TLS).
-# Les fichiers montés correspondent à la version épinglée : les mettre à jour
-# avec elle (voir README.md).
+# Les fichiers nginx du fork doivent correspondre à la version épinglée : les mettre à jour
+# avec elle, puis reconstruire l'image frontend (voir README.md).
 
 x-flags: &penpot-flags
   PENPOT_FLAGS: ${PENPOT_FLAGS:-disable-email-verification enable-smtp enable-prepl-server disable-secure-session-cookies enable-mcp}
@@ -41,15 +42,21 @@ volumes:
 
 services:
   penpot-frontend:
-    image: "penpotapp/frontend:${PENPOT_VERSION:-2.19.3}"
+    # Image EGEN : officielle penpotapp/frontend + fichiers nginx du fork cuits
+    # (PENPOT_FRAME_ANCESTORS). À construire une fois : `docker compose build
+    # penpot-frontend` (et à chaque changement de PENPOT_VERSION ou des fichiers
+    # docker/images/files/nginx-*). Les autres services restent officiels.
+    image: "egen-penpot-frontend:${PENPOT_VERSION:-2.19.3}"
+    build:
+      context: ..
+      dockerfile: egen/Dockerfile.frontend
+      args:
+        PENPOT_VERSION: ${PENPOT_VERSION:-2.19.3}
     restart: always
     ports:
       - "${PENPOT_BIND:-127.0.0.1:9001}:8080"
     volumes:
       - penpot_assets:/opt/data/assets
-      # EGEN : embarquement en iframe. Fichiers du fork, alignés sur PENPOT_VERSION.
-      - ../images/files/nginx-entrypoint.sh:/entrypoint.sh:ro
-      - ../images/files/nginx-security-headers.conf.template:/tmp/nginx-security-headers.conf.template:ro
     depends_on:
       - penpot-backend
       - penpot-admin-console

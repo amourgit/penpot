@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: MPL-2.0
+#
+# Image frontend EGEN — couche de déploiement uniquement.
+#
+#   FROM penpotapp/frontend:<PENPOT_VERSION>  (image officielle, bundle compilé inclus)
+#   + les deux fichiers nginx du fork cuits dans l'image :
+#       docker/images/files/nginx-entrypoint.sh
+#       docker/images/files/nginx-security-headers.conf.template
+#     (PENPOT_FRAME_ANCESTORS : embarquement en iframe, opt-in).
+#
+# Contexte de build : le dossier `docker/` (contexte minime, ~360 Ko) —
+# d'où `COPY images/files/...`. Seul le service `penpot-frontend` utilise
+# cette image ; les autres services restent sur les images officielles.
+#
+# Limite : cette image ne contient PAS le code applicatif Penpot compilé
+# (frontend ClojureScript). Pour modifier le frontend/backend Penpot
+# lui-même, il faut le build complet (`docker/images/Dockerfile.frontend`
+# avec `bundle-frontend/`) — voir EGEN.md.
+#
+# Usage (depuis docker/egen) :
+#   docker compose build penpot-frontend   # à refaire à chaque PENPOT_VERSION
+#   docker compose up -d
+
+ARG PENPOT_VERSION=2.19.3
+FROM penpotapp/frontend:${PENPOT_VERSION}
+
+USER root
+COPY images/files/nginx-entrypoint.sh /entrypoint.sh
+COPY images/files/nginx-security-headers.conf.template /tmp/nginx-security-headers.conf.template
+
+USER penpot:penpot

@@ -1,8 +1,10 @@
 # Déployer Penpot pour EGEN
 
 Penpot (version **2.19.3**) à déployer à une adresse propre, pour être embarqué dans le Core par
-`integrations/egen/esm-penpot-app`. On utilise les **images officielles** `penpotapp/*` ; ce fork n'ajoute que
-`PENPOT_FRAME_ANCESTORS` (embarquement en iframe), apporté par deux fichiers nginx montés dans l'image frontend.
+`integrations/egen/esm-penpot-app`. On utilise les **images officielles** `penpotapp/*` ; le frontend
+utilise une **image dérivée locale** `egen-penpot-frontend` (`Dockerfile.frontend` ici) qui cuit les
+deux fichiers nginx du fork — `PENPOT_FRAME_ANCESTORS` (embarquement en iframe). Les autres services
+(backend, admin-console, mcp, exporter, postgres, valkey) restent sur les images officielles.
 Détail du pourquoi : `docs/technical-guide/configuration.md` (section « Embedding Penpot in another application »).
 
 ## Avant de commencer
@@ -20,7 +22,8 @@ cd docker/egen
 cp .env.example .env
 # Renseigner dans .env : PENPOT_PUBLIC_URI, PENPOT_FRAME_ANCESTORS (origine du Core), POSTGRES_PASSWORD,
 # PENPOT_SECRET_KEY (openssl rand -base64 64). En HTTPS, retirer `disable-secure-session-cookies` de PENPOT_FLAGS.
-docker compose up -d
+docker compose build penpot-frontend   # image dérivée : officielle + nginx du fork
+docker compose --profile dev up -d     # (--profile dev : Mailpit local pour le courrier)
 docker compose exec penpot-backend python3 manage.py create-profile    # premier utilisateur
 ```
 
@@ -75,12 +78,13 @@ sous-domaine du même site.
 
 ## Mettre à jour
 
-Les deux fichiers montés doivent correspondre à la version des images :
+L'image frontend dérivée doit correspondre à la version des images officielles, et les fichiers nginx
+du fork à celle des images :
 
 1. `git fetch upstream --tags` puis `git rebase <nouveau-tag> egen` (résoudre les conflits éventuels dans
    `docker/images/files/nginx-entrypoint.sh` et `nginx-security-headers.conf.template`) ;
 2. `bash docker/images/files/tests/test-frame-ancestors.sh` (doit afficher 0 échec) ;
-3. `PENPOT_VERSION=<nouveau-tag>` dans `.env`, puis `docker compose pull && docker compose up -d`.
+3. `PENPOT_VERSION=<nouveau-tag>` dans `.env`, puis `docker compose pull && docker compose build penpot-frontend && docker compose up -d`.
 
 ## Sauvegarde
 

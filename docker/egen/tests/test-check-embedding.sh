@@ -30,6 +30,7 @@ gen_headers() {
 serve() {
     local port=$((21000 + RANDOM % 15000)) d; d="$(mktemp -d -p "$ROOT")"; mkdir -p "$d/www" "$d/t"; echo ok > "$d/www/index.html"
     local loc="root $d/www;"; [ -n "${2:-}" ] && loc="return 302 $2;"
+    loc="$loc ${3:-}"
     cat > "$d/n.conf" <<NGX
 daemon off; pid $d/n.pid; error_log $d/e.log;
 events {}
@@ -81,5 +82,23 @@ echo "6. Redirection vers une autre origine"
 H="$(gen_headers PENPOT_FRAME_ANCESTORS='http://localhost:8080')"; DEST="$(serve "$H")"; SRC="$(serve "$H" "http://127.0.0.1:$DEST/")"
 run_check "http://127.0.0.1:$SRC" http://localhost:8080
 expect "redirection signalée, verdict sur la destination" 0 "redirige vers http://127.0.0.1:$DEST"
+
+echo "7. Backend de Penpot arrêté (le frontend répond, /api en 502) — le cas des logs de l'utilisateur"
+H="$(gen_headers PENPOT_FRAME_ANCESTORS='http://localhost:8080')"; P="$(serve "$H" "" "location /api/ { return 502; }")"
+run_check "http://127.0.0.1:$P" http://localhost:8080
+expect "embarquement OK mais backend en panne signalé (code 1)" 1 "BACKEND de Penpot ne répond pas \(HTTP 502.*password authentication failed|MAIS le backend"
+printf '%s' "$OUT" | grep -q "autorise http://localhost:8080" && ok "…l'embarquement, lui, est bien reconnu comme autorisé" || ko "embarquement non reconnu"
+H="$(gen_headers PENPOT_FRAME_ANCESTORS='http://localhost:8080')"; P="$(serve "$H" "" "location /api/ { return 200 '{}'; }")"
+run_check "http://127.0.0.1:$P" http://localhost:8080
+expect "backend qui répond : tout est vert" 0 "le backend de Penpot répond \(HTTP 200\)"
+
+echo "8. Le Core ouvert sur 0.0.0.0 (le cas des logs de l'utilisateur)"
+H="$(gen_headers PENPOT_FRAME_ANCESTORS='http://localhost:8080 http://127.0.0.1:8080')"; P="$(serve "$H")"
+run_check "http://127.0.0.1:$P" http://0.0.0.0:8080
+expect "0.0.0.0 non autorisé et expliqué" 1 "n'autorise PAS http://0.0.0.0:8080"
+printf '%s' "$OUT" | grep -q "0.0.0.0 n'est pas une adresse de navigation" && ok "l'avertissement 0.0.0.0 est affiché" || ko "avertissement 0.0.0.0 absent"
+H="$(gen_headers PENPOT_FRAME_ANCESTORS='http://localhost:8080 http://0.0.0.0:8080')"; P="$(serve "$H")"
+run_check "http://127.0.0.1:$P" http://0.0.0.0:8080
+expect "0.0.0.0 autorisé explicitement : accepté" 0 "autorise http://0.0.0.0:8080"
 
 echo; echo "Résultat : $PASS ok, $FAIL échec(s)"; [ "$FAIL" -eq 0 ]

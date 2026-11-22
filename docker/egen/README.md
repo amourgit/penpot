@@ -28,6 +28,20 @@ Le démarrage **échoue avec un message explicite** si `PENPOT_PUBLIC_URI`, `PEN
 ou `POSTGRES_PASSWORD` manque. Courrier : renseigner `PENPOT_SMTP_*` (ou `docker compose --profile dev up -d` pour un
 Mailpit local).
 
+## Essai en local (Core sur `http://localhost:8080`)
+
+```bash
+cd docker/egen
+cp .env.local.example .env        # valeurs d'essai : origines du Core déjà renseignées
+docker compose up -d
+docker compose exec penpot-backend python3 manage.py create-profile
+```
+
+Penpot est alors sur `http://localhost:9001`. Côté Core : `"penpotUrl": "http://localhost:9001"`.
+`localhost` des deux côtés est le même *site* (le port ne compte pas) : la session fonctionne dans l'iframe.
+Ce sont en revanche deux *origines* : `PENPOT_FRAME_ANCESTORS` doit contenir l'origine **exacte** du Core, telle
+qu'elle s'affiche dans la barre d'adresse (`http://localhost:8080` ≠ `http://127.0.0.1:8080`).
+
 ## Vérifier l'embarquement
 
 ```bash
@@ -37,6 +51,21 @@ curl -sI https://design.exemple.org/ | grep -iE "x-frame-options|content-securit
 Attendu : **pas** de `X-Frame-Options`, et un `Content-Security-Policy: frame-ancestors 'self' https://core.exemple.org`.
 Si `X-Frame-Options: SAMEORIGIN` apparaît encore, les fichiers montés ne sont pas pris en compte (chemins, ou image
 d'une autre version).
+
+## Diagnostic : l'iframe est vide, ou « localhost n'autorise pas la connexion »
+
+Ce message du navigateur est celui d'une iframe **refusée par Penpot**. Un script interroge Penpot comme le fait le
+navigateur et dit précisément pourquoi :
+
+```bash
+docker/egen/check-embedding.sh http://localhost:9001 http://localhost:8080
+#                              └─ adresse de Penpot   └─ origine du Core (barre d'adresse)
+```
+
+Il distingue : Penpot qui ne tourne pas (connexion refusée), `X-Frame-Options` encore présent (Penpot lancé **sans** les
+fichiers de ce fork, ou `PENPOT_FRAME_ANCESTORS` absent), une origine du Core non autorisée (`localhost` ≠ `127.0.0.1`,
+`http` ≠ `https`, port), une redirection vers une autre adresse. Il se teste lui-même :
+`bash docker/egen/tests/test-check-embedding.sh`.
 
 ## Cas d'un autre site que le Core
 

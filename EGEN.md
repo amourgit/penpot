@@ -13,6 +13,7 @@ restent alignées sur l'amont.
 | `docker/images/files/tests/test-frame-ancestors.sh` | 24 vérifications (entrypoint réel en bac à sable + nginx réel) |
 | `docs/technical-guide/configuration.md` | section « Embedding Penpot in another application » |
 | `docker/egen/` | déploiement : compose sur images officielles épinglées, `.env.example`, guide |
+| `docker/egen/check-embedding.sh` | diagnostic de l'embarquement (+ `tests/test-check-embedding.sh`, 11 vérifications) ; `.env.local.example` : essai local |
 | `integrations/egen/esm-penpot-app/` | paquet d'application externe pour le Core (`@civitas/esm-penpot-app`) |
 | `.github/workflows/egen-penpot-app.yml` | construit le paquet et l'attache à une release |
 

@@ -1,0 +1,45 @@
+{
+  "$schema": "https://egen.alpha.vercel.com/routes.schema.json",
+  "pages": [
+    {
+      "component": "root",
+      "route": "penpot",
+      "online": true,
+      "offline": false
+    }
+  ],
+  "extensions": [
+    {
+      "name": "penpot-rail",
+      "slot": "shell-rail-left-slot",
+      "component": "railPanel",
+      "online": true,
+      "offline": false,
+      "order": 60,
+      "meta": {
+        "title": "Penpot",
+        "icon": "PenTool",
+        "order": 60,
+        "global": true
+      }
+    },
+    {
+      "name": "penpot-nav-design",
+      "slot": "topbar-nav-slot",
+      "component": "navEntry",
+      "online": true,
+      "offline": false,
+      "order": 610,
+      "meta": {
+        "section": "penpot",
+        "sectionLabel": "Penpot",
+        "group": "conception",
+        "groupLabel": "Conception",
+        "label": "Maquettes et prototypes",
+        "description": "Ouvrir Penpot : conception, maquettes et prototypes",
+        "icon": "PenTool",
+        "route": "penpot"
+      }
+    }
+  ]
+}

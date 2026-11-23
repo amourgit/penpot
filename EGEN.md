@@ -16,9 +16,10 @@ restent alignées sur l'amont.
 | `docker/egen/check-embedding.sh` | diagnostic de l'embarquement (+ `tests/test-check-embedding.sh`, 11 vérifications) ; `.env.local.example` : essai local |
 | `integrations/egen/esm-penpot-app/` | paquet d'application externe pour le Core (`@civitas/esm-penpot-app`) |
 | `.github/workflows/egen-penpot-app.yml` | construit le paquet et l'attache à une release |
+| `frontend/src/app/main/ui/dashboard*.{cljs,scss}`, `frontend/resources/styles/common/refactor/{basic-rules,common-dashboard}.scss`, `settings/{delete_account,change_email}.scss` | dashboard responsive (tiroir mobile, modales bornées à la largeur de l'écran) pour l'affichage en iframe |
+| `docker/egen/Dockerfile.frontend-full`, `docker/egen/update-frontend.sh` | image frontend = image officielle + bundle compilé du fork ; mise à jour en une commande |
 
-Sans `PENPOT_FRAME_ANCESTORS`, le comportement est **exactement** celui d'upstream. Aucun code de l'application
-(backend Clojure, frontend ClojureScript, exporter) n'est modifié. Licence : MPL-2.0, comme upstream.
+Sans `PENPOT_FRAME_ANCESTORS`, le comportement est **exactement** celui d'upstream. Le backend Clojure et l'exporter ne sont pas modifiés ; seul le frontend (dashboard) l'est, pour le responsive. Licence : MPL-2.0, comme upstream.
 
 ## Rester à jour avec l'amont
 

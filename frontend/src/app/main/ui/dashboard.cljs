@@ -340,7 +340,7 @@
         (mf/use-fn
          #(reset! sidebar-open* false))]
 
-    (mf/with-effect [section]
+    (mf/with-effect [section project-id team-id]
       (reset! sidebar-open* false))
 
     (hooks/use-shortcuts ::dashboard sc/shortcuts-dashboard :dashboard)
@@ -395,7 +395,8 @@
                               :on-layout-change on-layout-change}]
       [:> icon-button* {:icon i/menu
                         :variant "ghost"
-                        :class (stl/css :mobile-nav-button)
+                        :class (stl/css-case :mobile-nav-button true
+                                           :mobile-nav-button-hidden @sidebar-open*)
                         :aria-label (tr "labels.menu")
                         :on-click on-sidebar-toggle}]
       (when @sidebar-open*

@@ -689,9 +689,9 @@
   border-radius: $br-8;
   background-color: var(--modal-background-color);
   border: $s-2 solid var(--modal-border-color);
-  min-width: $s-364;
+  min-width: min($s-364, calc(100vw - #{$s-32}));
   min-height: $s-192;
-  max-width: $s-512;
+  max-width: min($s-512, calc(100vw - #{$s-32}));
   max-height: $s-512;
 }
 

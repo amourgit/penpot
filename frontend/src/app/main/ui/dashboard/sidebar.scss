@@ -27,6 +27,24 @@
   background-color: var(--panel-background-color);
 }
 
+// On narrow screens the sidebar becomes an off-canvas drawer toggled by the
+// dashboard's mobile nav button; the content area takes the full width.
+@media (width <= 760px) {
+  .dashboard-sidebar {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-start: -110%;
+    inline-size: min(px2rem(320), 85vw);
+    z-index: calc(var(--z-index-set) - 1);
+    margin: 0;
+    transition: inset-inline-start 0.2s ease-in-out;
+
+    &.sidebar-open {
+      inset-inline-start: 0;
+    }
+  }
+}
+
 // SIDEBAR CONTENT COMPONENT
 .sidebar-content-wrapper {
   display: flex;

@@ -47,7 +47,8 @@
 
 .title {
   pointer-events: all;
-  width: px2rem(420);
+  inline-size: px2rem(420);
+  max-inline-size: 100%;
   inset-block-start: calc(-1 * $sz-40);
   text-align: right;
   height: px2rem(56);

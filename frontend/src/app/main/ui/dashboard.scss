@@ -27,3 +27,30 @@
   overflow: hidden;
   inline-size: 100%;
 }
+
+.mobile-nav-button,
+.sidebar-backdrop {
+  display: none;
+}
+
+@media (width <= 760px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+  }
+
+  .mobile-nav-button {
+    display: flex;
+    position: fixed;
+    inset-block-start: var(--sp-m);
+    inset-inline-start: var(--sp-m);
+    z-index: calc(var(--z-index-set) - 1);
+  }
+
+  .sidebar-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: var(--color-overlay-default);
+    z-index: calc(var(--z-index-set) - 2);
+  }
+}

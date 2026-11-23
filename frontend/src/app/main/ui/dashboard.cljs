@@ -35,6 +35,8 @@
    [app.main.ui.dashboard.sidebar :refer [sidebar*]]
    [app.main.ui.dashboard.team :refer [team-settings-page* team-members-page* team-invitations-page* webhooks-page*]]
    [app.main.ui.dashboard.templates :refer [templates-section*]]
+   [app.main.ui.ds.buttons.icon-button :refer [icon-button*]]
+   [app.main.ui.ds.foundations.assets.icon :as i]
    [app.main.ui.hooks :as hooks]
    [app.main.ui.modal :refer [modal-container*]]
    [app.main.ui.workspace.plugins]
@@ -326,7 +328,20 @@
         on-layout-change
         (mf/use-fn
          (fn [value]
-           (reset! layout* (keyword value))))]
+           (reset! layout* (keyword value))))
+
+        sidebar-open*    (mf/use-state false)
+
+        on-sidebar-toggle
+        (mf/use-fn
+         #(swap! sidebar-open* not))
+
+        on-sidebar-close
+        (mf/use-fn
+         #(reset! sidebar-open* false))]
+
+    (mf/with-effect [section]
+      (reset! sidebar-open* false))
 
     (hooks/use-shortcuts ::dashboard sc/shortcuts-dashboard :dashboard)
 
@@ -359,6 +374,7 @@
      ;; components on team change. Many components assumes that the
      ;; team is already set so don't put the team into mf/deps.
      [:main {:class (stl/css :dashboard)
+             :data-dashboard true
              :key (dm/str (:id team))}
       [:> sidebar* {:team team
                     :projects projects
@@ -366,7 +382,8 @@
                     :default-project default-project
                     :profile profile
                     :section section
-                    :search-term search-term}]
+                    :search-term search-term
+                    :sidebar-open @sidebar-open*}]
       [:> dashboard-content* {:projects projects
                               :profile profile
                               :project project
@@ -375,7 +392,15 @@
                               :search-term search-term
                               :team team
                               :layout layout
-                              :on-layout-change on-layout-change}]]]))
+                              :on-layout-change on-layout-change}]
+      [:> icon-button* {:icon i/menu
+                        :variant "ghost"
+                        :class (stl/css :mobile-nav-button)
+                        :aria-label (tr "labels.menu")
+                        :on-click on-sidebar-toggle}]
+      (when @sidebar-open*
+        [:div {:class (stl/css :sidebar-backdrop)
+               :on-click on-sidebar-close}])]]))
 
 (mf/defc dashboard-page*
   {::mf/lazy-load true}

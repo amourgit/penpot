@@ -776,8 +776,10 @@
 
 (mf/defc sidebar*
   {::mf/wrap [mf/memo]}
-  [{:keys [team profile] :as props}]
-  [:nav {:class (stl/css :dashboard-sidebar) :data-testid "dashboard-sidebar"}
+  [{:keys [team profile sidebar-open] :as props}]
+  [:nav {:class (stl/css-case :dashboard-sidebar true
+                              :sidebar-open sidebar-open)
+         :data-testid "dashboard-sidebar"}
    [:> sidebar-content* props]
    [:> profile-section*
     {:profile profile

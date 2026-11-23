@@ -3072,6 +3072,10 @@ msgstr "Member"
 msgid "labels.members"
 msgstr "Members"
 
+#: src/app/main/ui/dashboard.cljs:399
+msgid "labels.menu"
+msgstr "Menu"
+
 #: src/app/main/ui/comments.cljs:627
 msgid "labels.mention"
 msgstr "Mention"

@@ -141,6 +141,39 @@
   }
 }
 
+// On narrow screens the dashboard shows a fixed nav button; reserve space for
+// it in the header and let the section nav scroll horizontally instead of
+// overflowing. Scoped to [data-dashboard] so the standalone settings page,
+// which reuses .dashboard-header, is not affected.
+@media (width <= 760px) {
+  [data-dashboard] .dashboard-header {
+    padding-inline-start: $s-64;
+    flex-wrap: wrap;
+    block-size: auto;
+    min-block-size: $s-64;
+    max-block-size: none;
+    row-gap: $s-s;
+
+    nav {
+      justify-content: flex-start;
+      min-width: 0;
+      overflow-x: auto;
+
+      ul {
+        flex-wrap: nowrap;
+      }
+
+      li {
+        a {
+          flex-basis: auto;
+          padding: $s-4 $s-12;
+          white-space: nowrap;
+        }
+      }
+    }
+  }
+}
+
 .btn-primary {
   @extend %button-primary;
 

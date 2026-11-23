@@ -136,9 +136,6 @@ export function createPenpotLifecycle(options: PenpotLifecycleOptions): LifeCycl
       let teardown: () => void = () => undefined;
       if (iframe) {
         iframe.setAttribute('allow', IFRAME_ALLOW);
-        // Demande au shell de donner à ce conteneur la hauteur de
-        // #egen-scroll-region (règle :has(> [data-egen-fill]) du styleguide).
-        iframe.setAttribute('data-egen-fill', '');
         // Hauteur = espace visible DANS la zone de scroll du shell (#egen-scroll-region),
         // pas le viewport : le footer, la zone basse et les marges de la carte ne
         // doivent pas être couverts (sinon la zone parente scrolle).

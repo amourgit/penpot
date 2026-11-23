@@ -64,7 +64,7 @@
   },
   "dependencies": {
     "@egen-civitas/esm-integration-utils": "^0.2.0",
-    "@egen-civitas/esm-nextjs-utils": "^0.2.0"
+    "@egen-civitas/esm-nextjs-utils": "^0.3.0"
   },
   "devDependencies": {
     "@egen-civitas/egen": "^3.0.0",

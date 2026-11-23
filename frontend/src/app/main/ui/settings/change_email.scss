@@ -13,7 +13,7 @@
 .modal-container {
   @extend %modal-container-base;
 
-  min-width: deprecated.$s-408;
+  min-width: min(deprecated.$s-408, calc(100vw - #{deprecated.$s-32}));
 }
 
 .modal-header {

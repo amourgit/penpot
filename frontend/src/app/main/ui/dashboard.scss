@@ -38,12 +38,21 @@
     grid-template-columns: 1fr;
   }
 
+  .dashboard {
+    block-size: 100dvh;
+  }
+
   .mobile-nav-button {
     display: flex;
     position: fixed;
     inset-block-start: var(--sp-m);
     inset-inline-start: var(--sp-m);
     z-index: calc(var(--z-index-set) - 1);
+  }
+
+  // Le tiroir est ouvert : le bouton ne doit plus gêner l'affichage du menu.
+  .mobile-nav-button-hidden {
+    display: none;
   }
 
   .sidebar-backdrop {

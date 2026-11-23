@@ -24,6 +24,10 @@
 .dashboard-projects {
   user-select: none;
   block-size: calc(100vh - px2rem(80));
+
+  @media (width <= 760px) {
+    block-size: calc(100dvh - px2rem(80));
+  }
 }
 
 .with-team-hero {

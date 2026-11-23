@@ -38,7 +38,7 @@
 }
 
 .team-form {
-  min-inline-size: px2rem(400);
+  min-inline-size: min(px2rem(400), calc(100vw - px2rem(72)));
 }
 
 .group-name-input {

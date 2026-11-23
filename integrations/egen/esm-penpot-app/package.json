@@ -1,6 +1,6 @@
 {
   "name": "@civitas/esm-penpot-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MPL-2.0",
   "description": "Penpot dans EGEN : enveloppe d'application externe (iframe + configuration runtime) qui affiche une instance Penpot déployée à une adresse connue, dans la zone principale du Core.",
   "browser": "dist/civitas-esm-penpot-app.js",

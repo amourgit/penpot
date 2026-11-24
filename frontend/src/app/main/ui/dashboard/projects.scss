@@ -24,10 +24,6 @@
 .dashboard-projects {
   user-select: none;
   block-size: calc(100vh - px2rem(80));
-
-  @media (width <= 760px) {
-    block-size: calc(100dvh - px2rem(80));
-  }
 }
 
 .with-team-hero {
@@ -226,5 +222,44 @@
   @media (width <= 1200px) {
     display: none;
     inline-size: 0;
+  }
+}
+
+// Écrans étroits : la page défile d'un seul bloc au lieu de hauteurs calées
+// sur 100vh (qui rognaient le bas dès que l'en-tête ou la bannière grandit).
+@media (width <= 760px) {
+  .projects-container {
+    min-block-size: 0;
+    overflow-y: auto;
+  }
+
+  .dashboard-container {
+    margin-inline-end: 0;
+  }
+
+  .dashboard-projects,
+  .with-team-hero {
+    block-size: auto;
+    overflow-y: visible;
+  }
+
+  .placeholder-placement {
+    margin: var(--sp-l);
+  }
+
+  .project-actions {
+    margin-inline-start: var(--sp-s);
+    gap: var(--sp-s);
+  }
+
+  .team-hero {
+    margin: var(--sp-s);
+  }
+}
+
+// Pas de survol au tactile : les actions des projets doivent rester visibles.
+@media (hover: none) {
+  .dashboard-project-row {
+    --actions-opacity: 1;
   }
 }

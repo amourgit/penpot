@@ -406,3 +406,10 @@ $thumbnail-default-height: px2rem(168);
 .grid-loader {
   --icon-width: calc(var(--thumbnail-width, #{$thumbnail-default-width}) * 0.25);
 }
+
+// Pas de survol au tactile : le menu d'options des cartes reste visible.
+@media (hover: none) {
+  .project-thumbnail-actions {
+    opacity: 1;
+  }
+}

@@ -321,3 +321,34 @@
     color: var(--color-foreground-secondary);
   }
 }
+
+// Écrans étroits : plus de retrait de 120px ni de colonnes de 200 à 500px.
+@media (width <= 760px) {
+  .dashboard-fonts {
+    padding-inline: var(--sp-m);
+    padding-block-end: var(--sp-xxl);
+  }
+
+  .installed-fonts-header > .family {
+    inline-size: auto;
+    min-inline-size: 0;
+  }
+
+  .font-item {
+    flex-wrap: wrap;
+    gap: var(--sp-s);
+    padding: var(--sp-m);
+
+    .family,
+    .filenames,
+    .options {
+      inline-size: auto;
+      min-inline-size: 0;
+      padding-inline-start: 0;
+    }
+  }
+
+  .dashboard-fonts-hero .desc {
+    inline-size: 100%;
+  }
+}

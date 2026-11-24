@@ -523,7 +523,7 @@
   margin: 0;
   padding: var(--sp-xxxl);
   padding: 0;
-  inline-size: px2rem(468);
+  inline-size: min(px2rem(468), calc(100vw - #{$sz-32}));
 }
 
 .hero-title {
@@ -635,7 +635,7 @@
 .modal-team-container {
   border-radius: $br-8;
   border: $b-2 solid var(--color-background-quaternary);
-  min-inline-size: $sz-364;
+  min-inline-size: min($sz-364, calc(100vw - #{$sz-32}));
   min-block-size: $sz-192;
   max-inline-size: $sz-512;
   max-block-size: $sz-512;
@@ -644,7 +644,7 @@
   top: px2rem(72);
   right: var(--sp-m);
   left: unset;
-  inline-size: $sz-400;
+  inline-size: min($sz-400, calc(100vw - #{$sz-32}));
   padding: var(--sp-xxxl);
   background-color: var(--color-background-primary);
   z-index: var(--z-index-set);
@@ -725,7 +725,7 @@
   border-radius: $br-8;
   background-color: var(--color-background-primary);
   border: $b-2 solid var(--color-background-quaternary);
-  min-inline-size: $sz-364;
+  min-inline-size: min($sz-364, calc(100vw - #{$sz-32}));
   min-block-size: $sz-192;
   max-inline-size: $sz-512;
   max-block-size: $sz-512;
@@ -935,7 +935,7 @@
 .modal-select-organization-container {
   display: flex;
   flex-direction: column;
-  inline-size: $sz-512;
+  inline-size: min($sz-512, calc(100vw - #{$sz-32}));
 }
 
 .modal-select-organization-header {
@@ -1072,4 +1072,32 @@
 
 a {
   color: var(--modal-link-foreground-color);
+}
+
+// Écrans étroits : tableaux en lignes compactes (l'en-tête de colonnes est
+// masqué) et plus de colonne « nom » de 300px minimum qui débordait.
+@media (width <= 760px) {
+  .table-header {
+    display: none;
+  }
+
+  .table-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    padding: 0 var(--sp-m);
+  }
+
+  .table-row-invitations {
+    grid-template-columns: minmax(0, 1fr) auto auto var(--sp-xxl);
+  }
+
+  .title-field-name,
+  .field-name {
+    inline-size: auto;
+    min-inline-size: 0;
+  }
+
+  .modal-team-container {
+    inset-inline: var(--sp-m);
+    inline-size: auto;
+  }
 }

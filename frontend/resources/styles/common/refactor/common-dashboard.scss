@@ -147,12 +147,23 @@
 // which reuses .dashboard-header, is not affected.
 @media (width <= 760px) {
   [data-dashboard] .dashboard-header {
-    padding-inline-start: $s-64;
+    padding-inline: $s-40 $s-16;
     flex-wrap: wrap;
     block-size: auto;
     min-block-size: $s-64;
     max-block-size: none;
     row-gap: $s-8;
+
+    // Un titre long doit s'abréger (ellipse) et non dépasser l'écran.
+    .dashboard-title {
+      min-inline-size: 0;
+      max-inline-size: 100%;
+
+      h1 {
+        flex-shrink: 1;
+        min-inline-size: 0;
+      }
+    }
 
     nav {
       justify-content: flex-start;

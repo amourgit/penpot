@@ -28,7 +28,7 @@
   border-radius: $br-8;
   background-color: var(--color-background-primary);
   border: $b-2 solid var(--color-background-quaternary);
-  min-inline-size: $sz-364;
+  min-inline-size: min($sz-364, calc(100vw - #{$sz-32}));
   max-inline-size: $sz-512;
 }
 

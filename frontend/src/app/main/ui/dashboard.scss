@@ -35,11 +35,20 @@
 
 @media (width <= 760px) {
   .dashboard {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .dashboard {
     block-size: 100dvh;
+  }
+
+  // L'en-tête passe à la ligne en mobile : la première piste doit pouvoir
+  // grandir, sinon l'en-tête recouvre la liste. Les composants internes
+  // portent déjà leur propre gouttière gauche et droite.
+  .dashboard-content {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto minmax(0, 1fr);
+    padding: var(--sp-s) 0 0;
   }
 
   .mobile-nav-button {

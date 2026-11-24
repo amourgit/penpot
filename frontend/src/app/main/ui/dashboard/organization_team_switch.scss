@@ -437,3 +437,22 @@
   max-height: $sz-480;
   overflow-y: auto;
 }
+
+// Écrans étroits : les deux colonnes sont empilées et le menu tient dans le tiroir.
+@media (width <= 760px) {
+  .organization-team-dropdown {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    inline-size: calc(min(px2rem(320), 85vw) - 2 * var(--sp-s));
+    min-block-size: 0;
+    max-block-size: min($sz-520, calc(100dvh - px2rem(96)));
+    overflow-y: auto;
+  }
+
+  .teams-column {
+    border-inline-start: none;
+    border-block-start: $b-1 solid var(--color-background-quaternary);
+    padding-inline-start: 0;
+    padding-block-start: var(--sp-s);
+  }
+}

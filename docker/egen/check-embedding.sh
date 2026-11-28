@@ -72,7 +72,7 @@ fi
 ok "Penpot répond (HTTP ${STATUS:-?})"
 
 if [ "$FINAL_ORIGIN" != "$GIVEN_ORIGIN" ]; then
-    note "Penpot redirige vers $FINAL_ORIGIN : c'est CETTE adresse qui doit être dans « penpotUrl » (et PENPOT_PUBLIC_URI doit être l'adresse vue par le navigateur)."
+    note "Penpot redirige vers $FINAL_ORIGIN : c'est CETTE adresse que le navigateur doit voir : PENPOT_PUBLIC_URI (publiée comme `url` dans /egen-config.json) doit lui être identique."
 fi
 
 # --- X-Frame-Options : refuse tout embarquement par une autre origine ---------------------------

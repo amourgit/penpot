@@ -187,6 +187,31 @@ else
     export PENPOT_FRAME_DIRECTIVE="add_header X-Frame-Options SAMEORIGIN always;"
 fi
 
+# EGEN: integration declaration for the EGEN Core (docs/integration-apps/17 §7 of the Core).
+#
+# Penpot ships no EGEN client script, so the declaration asks for no capability: the Core embeds it
+# in an iframe and keeps the 1.1 protocol. It is published at /egen-config.json, rendered at EVERY
+# start from /tmp/egen-config.json.template, and only when the deployment is meant to be embedded:
+#   - PENPOT_FRAME_ANCESTORS is set (same opt-in as the framing headers above), and
+#   - PENPOT_PUBLIC_URI, the URL the browser reaches Penpot at, is a bare origin: https://host[:port],
+#     or http://localhost[:port] for a local trial (the Core must then allow plain http).
+# Otherwise nothing is published and /egen-config.json answers 404 (upstream behaviour). An invalid
+# PENPOT_PUBLIC_URI only skips the declaration (PENPOT_PUBLIC_URI also serves Penpot itself).
+# The file lives under /etc/nginx (writable here, like nginx.conf) and is served by an alias.
+_egen_file=/etc/nginx/egen-config.json
+rm -f "${_egen_file}"
+if [ -n "${PENPOT_FRAME_ANCESTORS:-}" ]; then
+    _egen_url="${PENPOT_PUBLIC_URI:-}"
+    _egen_url="${_egen_url%/}"
+    if [[ "${_egen_url}" =~ ^https://([A-Za-z0-9-]+\.)*[A-Za-z0-9-]+(:[0-9]{1,5})?$ ]] \
+        || [[ "${_egen_url}" =~ ^http://(localhost|127\.0\.0\.1)(:[0-9]{1,5})?$ ]]; then
+        sed "s|__PENPOT_PUBLIC_URL__|${_egen_url}|" /tmp/egen-config.json.template > "${_egen_file}"
+    else
+        echo "penpot: WARNING: /egen-config.json not published: PENPOT_PUBLIC_URI '${PENPOT_PUBLIC_URI:-}' is not a bare origin (https://host[:port], or http://localhost[:port])" >&2
+    fi
+fi
+unset _egen_file _egen_url
+
 # Remember whether the policy comes from the deployment before the default
 # is applied, so the warning below only fires for the default one.
 if [ -n "${PENPOT_CSP_POLICY:-}" ]; then

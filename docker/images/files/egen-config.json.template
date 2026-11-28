@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "name": "@civitas/esm-penpot-app",
+  "version": "1.0.0",
+  "title": "Penpot",
+  "url": "__PENPOT_PUBLIC_URL__",
+  "route": "penpot",
+  "technology": "other",
+  "navigation": { "mode": "none" },
+  "placement": { "rail": "left", "group": "Conception", "icon": "PenTool" },
+  "capabilities": {},
+  "iframe": {
+    "sandbox": ["allow-downloads", "allow-modals", "allow-popups-to-escape-sandbox"],
+    "allow": ["clipboard-read", "clipboard-write", "fullscreen"]
+  },
+  "config": {}
+}

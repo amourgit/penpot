@@ -27,5 +27,6 @@ FROM penpotapp/frontend:${PENPOT_VERSION}
 USER root
 COPY images/files/nginx-entrypoint.sh /entrypoint.sh
 COPY images/files/nginx-security-headers.conf.template /tmp/nginx-security-headers.conf.template
+COPY images/files/egen-config.json.template /tmp/egen-config.json.template
 
 USER penpot:penpot

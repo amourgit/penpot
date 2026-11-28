@@ -1,7 +1,7 @@
 # Déployer Penpot pour EGEN
 
-Penpot (version **2.19.3**) à déployer à une adresse propre, pour être embarqué dans le Core par
-`integrations/egen/esm-penpot-app`. On utilise les **images officielles** `penpotapp/*` ; le frontend
+Penpot (version **2.19.3**) à déployer à une adresse propre, pour être embarqué dans le Core
+(déclaration publiée à `/egen-config.json`, voir plus bas). On utilise les **images officielles** `penpotapp/*` ; le frontend
 utilise une **image dérivée locale** `egen-penpot-frontend` (`Dockerfile.frontend` ici) qui cuit les
 deux fichiers nginx du fork — `PENPOT_FRAME_ANCESTORS` (embarquement en iframe). Les autres services
 (backend, admin-console, mcp, exporter, postgres, valkey) restent sur les images officielles.
@@ -40,7 +40,7 @@ docker compose up -d
 docker compose exec penpot-backend python3 manage.py create-profile
 ```
 
-Penpot est alors sur `http://localhost:9001`. Côté Core : `"penpotUrl": "http://localhost:9001"`.
+Penpot est alors sur `http://localhost:9001`. Côté Core : entrée `embed` avec `"manifest": "http://localhost:9001/egen-config.json"`.
 `localhost` des deux côtés est le même *site* (le port ne compte pas) : la session fonctionne dans l'iframe.
 Ce sont en revanche deux *origines* : `PENPOT_FRAME_ANCESTORS` doit contenir l'origine **exacte** du Core, telle
 qu'elle s'affiche dans la barre d'adresse (`http://localhost:8080` ≠ `http://127.0.0.1:8080`).
@@ -113,3 +113,16 @@ du fork à celle des images :
 ## Sauvegarde
 
 Volumes `penpot_postgres_v15` (base) et `penpot_assets` (fichiers) : à sauvegarder ensemble.
+
+## Déclaration pour le Core (`/egen-config.json`)
+
+Au démarrage, le frontend publie `/egen-config.json` (modèle : `docker/images/files/egen-config.json.template`,
+rendu à **chaque** démarrage) quand `PENPOT_FRAME_ANCESTORS` est défini **et** que `PENPOT_PUBLIC_URI` est une
+origine nue : `https://hote[:port]`, ou `http://localhost[:port]` pour un essai (le Core doit alors autoriser
+http, `EGEN_EXTERNAL_ALLOW_HTTP=true`). `url` = `PENPOT_PUBLIC_URI` : c'est l'adresse chargée dans l'iframe.
+Sinon rien n'est publié (404) et un avertissement est écrit dans les logs du conteneur.
+
+Contenu fixe : route `penpot`, titre « Penpot », rail gauche, groupe « Conception », icône `PenTool`, navigation
+`none`, **aucune capacité** (Penpot n'embarque pas de client EGEN : le Core reste en protocole 1.1), droits
+d'iframe : téléchargements, modales, popups hors bac à sable, presse-papiers, plein écran. Le Core fige le
+SHA-256 de ce fichier : toute modification du modèle impose `yarn external:sync` côté Core.

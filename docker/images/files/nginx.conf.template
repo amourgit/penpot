@@ -192,6 +192,17 @@ http {
                 add_header Cache-Control "no-store, no-cache, max-age=0" always;
             }
 
+            # EGEN: declaration for the Core, generated at start by nginx-entrypoint.sh
+            # (only when PENPOT_FRAME_ANCESTORS and PENPOT_PUBLIC_URI are set). Missing file = 404,
+            # never the SPA fallback below; never cached, since the Core pins its SHA-256.
+            location = /egen-config.json {
+                alias /etc/nginx/egen-config.json;
+                default_type application/json;
+                include /etc/nginx/nginx-security-headers.conf;
+                add_header Cache-Control "no-store" always;
+                add_header Access-Control-Allow-Origin "*" always;
+            }
+
             location ~* \.(js|css|jpg|png|svg|gif|ttf|woff|woff2|wasm|map)$ {
                 include /etc/nginx/nginx-security-headers.conf;
                 add_header Cache-Control "public, max-age=604800" always; # 7 days

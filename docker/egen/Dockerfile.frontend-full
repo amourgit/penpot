@@ -5,6 +5,7 @@ RUN rm -rf /var/www/app/*
 COPY ./bundle-frontend/ /var/www/app/
 COPY ./files/config.js /var/www/app/js/config.js
 COPY ./files/nginx-entrypoint.sh /entrypoint.sh
+COPY ./files/egen-config.json.template /tmp/egen-config.json.template
 COPY ./files/nginx-security-headers.conf.template /tmp/nginx-security-headers.conf.template
 RUN if [ -f /var/www/app/csp-script-hashes.txt ]; then \
         mv /var/www/app/csp-script-hashes.txt /etc/nginx/csp-script-hashes.txt; \

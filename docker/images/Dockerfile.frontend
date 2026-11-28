@@ -30,6 +30,7 @@ COPY ./files/nginx-security-headers.conf.template /tmp/nginx-security-headers.co
 COPY ./files/nginx-mime.types /etc/nginx/mime.types
 COPY ./files/nginx-external-locations.conf /etc/nginx/overrides/location.d/external-locations.conf
 COPY ./files/nginx-entrypoint.sh /entrypoint.sh
+COPY ./files/egen-config.json.template /tmp/egen-config.json.template
 
 # The CSP hashes of the inline scripts of index.html are emitted by the
 # frontend build. Move them out of the document root: nginx must read them,

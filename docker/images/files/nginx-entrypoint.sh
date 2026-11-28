@@ -189,8 +189,8 @@ fi
 
 # EGEN: integration declaration for the EGEN Core (docs/integration-apps/17 §7 of the Core).
 #
-# Penpot ships no EGEN client script, so the declaration asks for no capability: the Core embeds it
-# in an iframe and keeps the 1.1 protocol. It is published at /egen-config.json, rendered at EVERY
+# Penpot ships no EGEN client script, so the declaration asks for no capability: the Core only embeds it
+# in an iframe (no shared navigation, no live channel with the Shell). It is published at /egen-config.json, rendered at EVERY
 # start from /tmp/egen-config.json.template, and only when the deployment is meant to be embedded:
 #   - PENPOT_FRAME_ANCESTORS is set (same opt-in as the framing headers above), and
 #   - PENPOT_PUBLIC_URI, the URL the browser reaches Penpot at, is a bare origin: https://host[:port],

@@ -35,4 +35,4 @@ Puis suivre `docker/egen/README.md` (« Mettre à jour »).
 ## Par où commencer
 
 1. `docker/egen/README.md` : déployer Penpot.
-2. Core : une entrée `embed` dans `external-apps.json` (`"manifest": "<PENPOT_PUBLIC_URI>/egen-config.json"`) puis `yarn external:sync` — `docs/integration-apps/17 §7` du Core. Penpot n'embarque pas de client EGEN : la déclaration ne demande aucune capacité, le Core reste en protocole 1.1.
+2. Core : une entrée `embed` dans `external-apps.json` (`"manifest": "<PENPOT_PUBLIC_URI>/egen-config.json"`) puis `yarn external:sync` — `docs/integration-apps/17 §7` du Core. Penpot n'embarque pas de client EGEN : la déclaration ne demande aucune capacité : le Core se contente d'afficher Penpot dans l'iframe (sans navigation partagée ni canal avec le Shell).

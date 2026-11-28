@@ -123,6 +123,6 @@ http, `EGEN_EXTERNAL_ALLOW_HTTP=true`). `url` = `PENPOT_PUBLIC_URI` : c'est l'ad
 Sinon rien n'est publié (404) et un avertissement est écrit dans les logs du conteneur.
 
 Contenu fixe : route `penpot`, titre « Penpot », rail gauche, groupe « Conception », icône `PenTool`, navigation
-`none`, **aucune capacité** (Penpot n'embarque pas de client EGEN : le Core reste en protocole 1.1), droits
+`none`, **aucune capacité** (Penpot n'embarque pas de client EGEN : le Core se contente de l'afficher dans l'iframe, sans navigation partagée ni canal avec le Shell), droits
 d'iframe : téléchargements, modales, popups hors bac à sable, presse-papiers, plein écran. Le Core fige le
 SHA-256 de ce fichier : toute modification du modèle impose `yarn external:sync` côté Core.
